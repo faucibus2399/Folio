@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Folio" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#8D5B3E</item>
+        <item name="colorSecondary">#8D6E63</item>
+    </style>
+</resources>

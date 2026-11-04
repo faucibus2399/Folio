@@ -5,6 +5,7 @@ A simple, offline EPUB reader with vertical scroll reading.
 ## Features
 - **Library**: add EPUBs from your phone (or open them straight from a file manager / Downloads). Shows covers, author and reading progress. Long-press a book to remove it.
 - **Scroll reading**: each chapter scrolls top to bottom. "Next chapter" / "Previous chapter" buttons sit at the end of each chapter, and you can also use the arrows or chapter slider in the bottom bar.
+- **Pull to change chapter**: at the bottom of a chapter, keep pulling up until the bubble says "Release for next chapter", then let go. At the top, pull down to go back to the end of the previous chapter. You'll feel a small buzz when it's ready. This can be turned off in Aa → More.
 - **Tap the page** to show or hide the menu (the reader goes fullscreen when the menu is hidden).
 - **Chapters**: the list icon at the top right opens the book's table of contents, with the current chapter highlighted.
 - **Bookmarks**: the bookmark icon saves your exact spot along with a short text snippet. Tap it again on the same spot to remove it. The stacked-bookmarks icon lists them all; long-press one to delete it.
