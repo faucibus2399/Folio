@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:paddingStart="20dp" android:paddingEnd="20dp"
+    android:paddingTop="8dp" android:paddingBottom="28dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="0dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Theme" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButtonToggleGroup android:id="@+id/themeGroup"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp"
+        app:singleSelection="true" app:selectionRequired="true">
+        <Button android:id="@+id/themeLight" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Light"/>
+        <Button android:id="@+id/themeSepia" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Sepia"/>
+        <Button android:id="@+id/themeDark" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Dark"/>
+        <Button android:id="@+id/themeBlack" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Black"/>
+        <Button android:id="@+id/themeSystem" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Auto"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Text size" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+        <TextView android:id="@+id/fontSizeValue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge" android:alpha="0.75"/>
+    </LinearLayout>
+    <com.google.android.material.slider.Slider android:id="@+id/fontSizeSlider"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:valueFrom="12" android:valueTo="40" android:stepSize="1" app:labelBehavior="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Line spacing" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+        <TextView android:id="@+id/lineValue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge" android:alpha="0.75"/>
+    </LinearLayout>
+    <com.google.android.material.slider.Slider android:id="@+id/lineSlider"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:valueFrom="1.0" android:valueTo="2.6" android:stepSize="0.1" app:labelBehavior="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Paragraph spacing" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+        <TextView android:id="@+id/paraValue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge" android:alpha="0.75"/>
+    </LinearLayout>
+    <com.google.android.material.slider.Slider android:id="@+id/paraSlider"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:valueFrom="0.0" android:valueTo="2.0" android:stepSize="0.1" app:labelBehavior="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Side margins" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+        <TextView android:id="@+id/marginValue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge" android:alpha="0.75"/>
+    </LinearLayout>
+    <com.google.android.material.slider.Slider android:id="@+id/marginSlider"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:valueFrom="0" android:valueTo="64" android:stepSize="4" app:labelBehavior="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Letter spacing" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+        <TextView android:id="@+id/letterValue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge" android:alpha="0.75"/>
+    </LinearLayout>
+    <com.google.android.material.slider.Slider android:id="@+id/letterSlider"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:valueFrom="-0.05" android:valueTo="0.2" android:stepSize="0.01" app:labelBehavior="gone"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Font (hold a custom font to remove it)" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+    </LinearLayout>
+    <com.google.android.material.chip.ChipGroup android:id="@+id/fontGroup"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        app:singleSelection="true" app:selectionRequired="true"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnImportFont"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Import font (.ttf / .otf)" app:icon="@drawable/ic_add"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Alignment" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButtonToggleGroup android:id="@+id/alignGroup"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp"
+        app:singleSelection="true" app:selectionRequired="true">
+        <Button android:id="@+id/alignOriginal" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Book default"/>
+        <Button android:id="@+id/alignLeft" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Left"/>
+        <Button android:id="@+id/alignJustify" style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:minWidth="0dp" android:paddingStart="2dp" android:paddingEnd="2dp"
+            android:textSize="13sp" android:text="Justify"/>
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="Brightness" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:orientation="horizontal">
+        <com.google.android.material.slider.Slider android:id="@+id/brightnessSlider"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:valueFrom="0.05" android:valueTo="1.0" android:stepSize="0.05" app:labelBehavior="gone"/>
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/brightnessAuto"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp"
+            android:text="System"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="18dp" android:orientation="horizontal">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="More" android:textAppearance="?attr/textAppearanceLabelLarge"/>
+    </LinearLayout>
+    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/swHyphen"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:text="Hyphenation"/>
+    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/swKeepOn"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:text="Keep screen on while reading"/>
+    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/swVolume"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:text="Volume buttons scroll the page"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnReset"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+        android:layout_gravity="end" android:text="Reset to defaults"/>
+</LinearLayout>
+</androidx.core.widget.NestedScrollView>
