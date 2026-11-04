@@ -19,6 +19,7 @@ class ReaderSettings {
     var brightness = -1f        // -1 = system
     var keepScreenOn = false
     var volumeKeys = true
+    var pullToTurn = true       // pull past the end/start of a chapter to change chapter
 
     data class Palette(val bg: Int, val fg: Int, val link: Int, val ui: Int, val dark: Boolean)
 
@@ -59,6 +60,9 @@ class ReaderSettings {
         val link = hex(p.link)
         val sb = StringBuilder()
         sb.append("html,body{background:$bg !important;color:$fg !important;}")
+        // Some books make <body> its own scroll box (height:100%; overflow:auto). That hides the real
+        // scroll position from the app, which breaks pull-to-change-chapter and position saving.
+        sb.append("html,body{height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;}")
         sb.append("html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}")
         sb.append(
             "body{margin:0 !important;padding:${safeTop + 20}px ${margin}px ${safeBottom + 28}px ${margin}px !important;" +
@@ -98,6 +102,7 @@ class ReaderSettings {
             .putFloat("paraSpacing", paraSpacing).putInt("margin", margin).putFloat("letterSpacing", letterSpacing)
             .putString("font", font).putString("align", align).putBoolean("hyphenate", hyphenate)
             .putFloat("brightness", brightness).putBoolean("keepScreenOn", keepScreenOn).putBoolean("volumeKeys", volumeKeys)
+            .putBoolean("pullToTurn", pullToTurn)
             .apply()
     }
 
@@ -120,6 +125,7 @@ class ReaderSettings {
                 brightness = p.getFloat("brightness", d.brightness)
                 keepScreenOn = p.getBoolean("keepScreenOn", d.keepScreenOn)
                 volumeKeys = p.getBoolean("volumeKeys", d.volumeKeys)
+                pullToTurn = p.getBoolean("pullToTurn", d.pullToTurn)
             }
         }
     }

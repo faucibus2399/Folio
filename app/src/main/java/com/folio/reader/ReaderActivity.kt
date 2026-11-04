@@ -7,7 +7,12 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.graphics.drawable.GradientDrawable
+import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
+import android.view.MotionEvent
+import android.widget.FrameLayout
 import android.view.View
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
@@ -126,6 +131,15 @@ class ReaderActivity : AppCompatActivity() {
     private var safeBottom = 0
     private var onFontsChanged: (() -> Unit)? = null
 
+    // Pull-past-the-edge to change chapter
+    private lateinit var pullBubble: TextView
+    private var pullStartY = -1f
+    private var pullDir = 0          // 1 = pulling for next (at bottom), -1 = pulling for previous (at top)
+    private var pullArmed = false
+    private var insetTopPx = 0
+    private var insetBottomPx = 0
+    private val density by lazy { resources.displayMetrics.density }
+
     @Volatile private var pendingFrac = 0f
     @Volatile private var loadToken = 0
     @Volatile private var cssText = ""
@@ -157,6 +171,7 @@ class ReaderActivity : AppCompatActivity() {
         seek = findViewById(R.id.chapterSeek)
         btnBookmark = findViewById(R.id.btnBookmark)
         btnSettings = findViewById(R.id.btnSettings)
+        pullBubble = findViewById(R.id.pullBubble)
         val btnBack = findViewById<ImageButton>(R.id.btnBack)
         val btnBookmarks = findViewById<ImageButton>(R.id.btnBookmarks)
         val btnToc = findViewById<ImageButton>(R.id.btnToc)
@@ -202,6 +217,8 @@ class ReaderActivity : AppCompatActivity() {
             )
             topBar.setPadding(bars.left, bars.top, bars.right, 0)
             bottomBar.setPadding(bars.left, 0, bars.right, bars.bottom)
+            insetTopPx = bars.top
+            insetBottomPx = bars.bottom
             val d = resources.displayMetrics.density
             val nt = (bars.top / d).roundToInt()
             val nb = (bars.bottom / d).roundToInt()
@@ -286,7 +303,7 @@ class ReaderActivity : AppCompatActivity() {
 
     // ------------------------------------------------------------------ web view
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun setupWebView() {
         with(webView.settings) {
             javaScriptEnabled = true
@@ -303,6 +320,11 @@ class ReaderActivity : AppCompatActivity() {
             cacheMode = WebSettings.LOAD_NO_CACHE
         }
         webView.addJavascriptInterface(Bridge(), "Android")
+        // Watch touches on the page (without consuming them) for the pull-to-change-chapter gesture
+        webView.setOnTouchListener { _, ev ->
+            handlePull(ev)
+            false
+        }
         webView.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                 val url = request.url
@@ -355,17 +377,18 @@ class ReaderActivity : AppCompatActivity() {
         if (isMainFrame && mime == "text/html") {
             val raw = b.readText(path) ?: return notFound()
             val idx = b.spineIndexOf(path)
-            val html = HtmlPrep.prepare(raw, headInjection(), if (idx >= 0) navInjection(idx, b.spine.size) else "")
+            val html = HtmlPrep.prepare(raw, headInjection(idx, b.spine.size), if (idx >= 0) navInjection(idx, b.spine.size) else "")
             return WebResourceResponse("text/html", "utf-8", ByteArrayInputStream(html.toByteArray(Charsets.UTF_8)))
         }
         val stream = b.openStream(path) ?: return notFound()
         return WebResourceResponse(mime, if (mime.startsWith("text/")) "utf-8" else null, stream)
     }
 
-    private fun headInjection(): String {
+    private fun headInjection(index: Int, size: Int): String {
         val script = READER_JS
             .replace("__TOKEN__", loadToken.toString())
             .replace("__FRAC__", String.format(Locale.US, "%.5f", pendingFrac))
+
         return "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\">" +
             "<style id=\"__folio_css\">$cssText</style><script>$script</script>"
     }
@@ -411,6 +434,97 @@ class ReaderActivity : AppCompatActivity() {
         updateBars()
         saveProgress()
         webView.loadUrl(b.urlFor(b.spine[index].path) + if (fragment != null) "#$fragment" else "")
+    }
+
+    // ------------------------------------------------------------------ pull to change chapter
+
+    private fun handlePull(ev: MotionEvent) {
+        val b = book
+        if (!settings.pullToTurn || b == null) {
+            hidePull()
+            return
+        }
+        when (ev.actionMasked) {
+            MotionEvent.ACTION_DOWN -> hidePull()
+            MotionEvent.ACTION_MOVE -> {
+                if (ev.pointerCount != 1) { hidePull(); return }
+                val y = ev.y
+                val atBottom = !webView.canScrollVertically(1)
+                val atTop = !webView.canScrollVertically(-1)
+                if (pullStartY < 0f) {
+                    // Start measuring the pull from the moment we hit an edge
+                    if (atTop || atBottom) { pullStartY = y; pullDir = 0 }
+                    return
+                }
+                val d = pullStartY - y // positive = finger moved up = pulling for the next chapter
+                if (pullDir == 0) {
+                    val slop = 8 * density
+                    when {
+                        d > slop && atBottom -> pullDir = 1
+                        d < -slop && atTop -> pullDir = -1
+                        abs(d) > slop -> pullStartY = -1f
+                    }
+                    return
+                }
+                if ((pullDir == 1 && !atBottom) || (pullDir == -1 && !atTop)) { hidePull(); return }
+                showPull(if (pullDir == 1) d else -d, b)
+            }
+            MotionEvent.ACTION_UP -> {
+                val go = pullArmed
+                val dir = pullDir
+                hidePull()
+                if (go) {
+                    if (dir == 1) openChapter(chapter + 1, 0f) else openChapter(chapter - 1, 1f)
+                }
+            }
+            MotionEvent.ACTION_CANCEL -> hidePull()
+        }
+    }
+
+    private fun showPull(amount: Float, b: EpubBook) {
+        if (amount <= 0f) {
+            pullBubble.alpha = 0f
+            pullArmed = false
+            return
+        }
+        val threshold = 90 * density
+        val available = if (pullDir == 1) chapter < b.spine.size - 1 else chapter > 0
+        val armed = available && amount >= threshold
+        pullBubble.text = when {
+            !available -> if (pullDir == 1) "End of book" else "Start of book"
+            armed -> if (pullDir == 1) "↑  Release for next chapter" else "↓  Release for previous chapter"
+            else -> if (pullDir == 1) "Pull up for next chapter" else "Pull down for previous chapter"
+        }
+        if (armed && !pullArmed) pullBubble.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        pullArmed = armed
+
+        val p = settings.palette(this)
+        pullBubble.background = GradientDrawable().apply {
+            cornerRadius = 22 * density
+            setColor(if (armed) p.link else p.ui)
+            setStroke((1 * density).roundToInt().coerceAtLeast(1), if (armed) p.link else ((p.fg and 0x00FFFFFF) or 0x44000000))
+        }
+        pullBubble.setTextColor(if (armed) p.bg else p.fg)
+
+        val lp = pullBubble.layoutParams as FrameLayout.LayoutParams
+        val margin = (18 * density).roundToInt()
+        lp.gravity = (if (pullDir == 1) Gravity.BOTTOM else Gravity.TOP) or Gravity.CENTER_HORIZONTAL
+        lp.topMargin = insetTopPx + margin
+        lp.bottomMargin = insetBottomPx + margin
+        pullBubble.layoutParams = lp
+
+        // Follows the finger a little so it feels attached to the pull
+        val shift = minOf(amount, threshold) * 0.25f
+        pullBubble.translationY = if (pullDir == 1) -shift else shift
+        pullBubble.alpha = (amount / (threshold * 0.6f)).coerceIn(0f, 1f)
+        pullBubble.visibility = View.VISIBLE
+    }
+
+    private fun hidePull() {
+        pullStartY = -1f
+        pullDir = 0
+        pullArmed = false
+        if (::pullBubble.isInitialized) pullBubble.visibility = View.GONE
     }
 
     private fun onScrolled(token: Int, f: Float) {
@@ -576,7 +690,9 @@ class ReaderActivity : AppCompatActivity() {
         if (settings.keepScreenOn) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        if (pageLoaded) js("window.__setCss&&window.__setCss(${JSONObject.quote(cssText)})")
+        if (pageLoaded) {
+            js("window.__setCss&&window.__setCss(${JSONObject.quote(cssText)})")
+        }
     }
 
     private fun snap(sl: Slider, v: Float): Float {
@@ -706,6 +822,10 @@ class ReaderActivity : AppCompatActivity() {
         }
 
         // Toggles
+        v.findViewById<MaterialSwitch>(R.id.swPull).apply {
+            isChecked = s.pullToTurn
+            setOnCheckedChangeListener { _, c -> s.pullToTurn = c; changed() }
+        }
         v.findViewById<MaterialSwitch>(R.id.swHyphen).apply {
             isChecked = s.hyphenate
             setOnCheckedChangeListener { _, c -> s.hyphenate = c; changed() }

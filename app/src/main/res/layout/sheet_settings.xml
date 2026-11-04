@@ -137,6 +137,9 @@
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
             android:text="More" android:textAppearance="?attr/textAppearanceLabelLarge"/>
     </LinearLayout>
+    <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/swPull"
+        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+        android:text="Pull past the end to change chapter"/>
     <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/swHyphen"
         android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
         android:text="Hyphenation"/>
